@@ -88,6 +88,27 @@ it('Should order tags alphabetical', async () => {
   expect(sorted).toStrictEqual(`a,20.0.2,2.0.0,1000.0.0,10.1.0,10.1.0-2,10.0.0,1.0.0,1.0.0-a01,v1,0.1.0-b01,0.0.1,0.0.1-rc01`)
 })
 
+it('Should order tags numerically', async () => {
+  const tags: TagInfo[] = [
+    {name: 'v10', commit: ''},
+    {name: 'v20', commit: ''},
+    {name: 'v5', commit: ''},
+    {name: 'v4', commit: ''},
+    {name: 'v200', commit: ''}
+  ]
+
+  const tagResolver = {
+    method: 'number'
+  }
+  const sorted = prepareAndSortTags(tags, tagResolver)
+    .map(function (tag) {
+      return tag.name
+    })
+    .join(',')
+
+  expect(sorted).toStrictEqual(`v200,v20,v10,v5,v4`)
+})
+
 it('Should filter tags correctly using the regex', async () => {
   const tags: TagInfo[] = [
     {name: 'api-0.0.1', commit: ''},
