@@ -1236,12 +1236,14 @@ exports.transformTags = transformTags;
   2020.3.0
   */
 function prepareAndSortTags(tags, tagResolver) {
-    if (tagResolver.method === 'sort') {
-        return stringTags(tags);
-    }
-    else {
-        // semver is default
-        return semVerTags(tags);
+    switch (tagResolver.method) {
+        case 'sort':
+            return stringTags(tags);
+        case 'number':
+            return numberTags(tags);
+        default:
+            // semver is default
+            return semVerTags(tags);
     }
 }
 exports.prepareAndSortTags = prepareAndSortTags;
@@ -1294,6 +1296,14 @@ function stringTags(tags) {
             }
         }
     });
+}
+function numberTags(tags) {
+    core.info(`Before sorting:${JSON.stringify(tags)}`);
+    const sortedTags = tags.sort((b, a) => {
+        return parseInt(a.name.replace(/^v/, '')) - parseInt(b.name.replace(/^v/, ''));
+    });
+    core.info(`After sorting:${JSON.stringify(sortedTags)}`);
+    return sortedTags;
 }
 
 

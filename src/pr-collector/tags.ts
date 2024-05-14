@@ -242,11 +242,14 @@ export function transformTags(tags: TagInfo[], transformer: RegexTransformer): T
   2020.3.0
   */
 export function prepareAndSortTags(tags: TagInfo[], tagResolver: TagResolver): TagInfo[] {
-  if (tagResolver.method === 'sort') {
-    return stringTags(tags)
-  } else {
-    // semver is default
-    return semVerTags(tags)
+  switch (tagResolver.method) {
+    case 'sort':
+      return stringTags(tags)
+    case 'number':
+      return numberTags(tags)
+    default:
+      // semver is default
+      return semVerTags(tags)
   }
 }
 
@@ -299,4 +302,13 @@ function stringTags(tags: TagInfo[]): TagInfo[] {
       }
     }
   })
+}
+
+function numberTags(tags: TagInfo[]): TagInfo[] {
+  core.info(`Before sorting:${JSON.stringify(tags)}`)
+  const sortedTags = tags.sort((b, a) => {
+    return parseInt(a.name.replace(/^v/, '')) - parseInt(b.name.replace(/^v/, ''))
+  })
+  core.info(`After sorting:${JSON.stringify(sortedTags)}`)
+  return sortedTags
 }
